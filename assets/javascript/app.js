@@ -10,33 +10,41 @@ firebase.initializeApp(config);
 
 var trainName = "";
 var destinationName = "";
-var firstTrainTime = 0;
-var frequency = 0;
+var firstTrainTime = "";
+var convertedFirstTrain = moment(firstTrainTime).format("HH:mm");
+var frequency = "";
+var convertedFrequency = moment(frequency, 'm mm'); 
+var minutesAway = "";
+var convertedMinutesAway = moment().subtract(convertedFirstTrain, "minutes");
+
 var database = firebase.database();
+
 
 $("#add-train").on("click", function(){
 	event.preventDefault();
 	trainName = $("#train-name").val().trim();
 	destinationName = $("#destination-name").val().trim();
-	firstTrainTime = $("#first-train").val().trim();
-	frequency = $("#frequency").val().trim();
+	convertedFirstTrain = $("#first-train").val().trim();
+	convertedFrequency = $("#frequency").val().trim();
+	convertedMinutesAway = $("#minutes-table").val().trim();
 
 	database.ref().push({
 		train: trainName,
 		destination: destinationName,
-		firsttrain: firstTrainTime,
-		frequency: frequency,
+		firsttrain: convertedFirstTrain,
+		frequency: convertedFrequency,
+		howmanyminutes: convertedMinutesAway,
 		dateAdded: firebase.database.ServerValue.TIMESTAMP
 	});
 });
 
 database.ref().on("child_added", function(childSnapshot) {
-	console.log(childSnapshot.val().trainName);
-	console.log(childSnapshot.val().destinationName);
-	console.log(childSnapshot.val().firstTrainTime);
-	console.log(childSnapshot.val().frequency);
+	// console.log(childSnapshot.val().trainName);
+	// console.log(childSnapshot.val().destinationName);
+	// console.log(childSnapshot.val().firstTrainTime);
+	// console.log(childSnapshot.val().frequency);
 
-	$("tbody").append("<tr><td>" + childSnapshot.val().train + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + childSnapshot.val().firsttrain + "</td></tr>");
+	$("tbody").append("<tr><td>" + childSnapshot.val().train + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + childSnapshot.val().firsttrain + "</td><td>" + childSnapshot.val().howmanyminutes + "</td></tr>");
 
 }, function(errorObject) {
 	console.log("Errors handled: " + errorObject.code);
@@ -49,6 +57,7 @@ database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", functi
 	$("#destination-table").html(snapshot.val().destination);
 	$("#next-arrival-table").html(snapshot.val().firsttrain);
 	$("#frequency-table").html(snapshot.val().frequency);
+	$("#minutes-table").html(snapshot.val().howmanyminutes);
 
 
 })
