@@ -1,3 +1,5 @@
+//Firebase Initialization//
+
 var config = {
     apiKey: "AIzaSyC1_DjfCRga_AsiaB-dsZt8Lmc10ELfvts",
     authDomain: "dreamer-8cf80.firebaseapp.com",
@@ -20,6 +22,8 @@ var convertedMinutesAway = moment().subtract(convertedFirstTrain, "minutes");
 var database = firebase.database();
 
 
+//On click function that adds user input to element id in html document//
+
 $("#add-train").on("click", function(){
 	event.preventDefault();
 	trainName = $("#train-name").val().trim();
@@ -28,6 +32,7 @@ $("#add-train").on("click", function(){
 	convertedFrequency = $("#frequency").val().trim();
 	convertedMinutesAway = $("#minutes-table").val().trim();
 
+//Setting the user input data into the database with assigned properties//
 	database.ref().push({
 		train: trainName,
 		destination: destinationName,
@@ -38,11 +43,10 @@ $("#add-train").on("click", function(){
 	});
 });
 
+
+//Taking a snapshot on each child added to the database and adding a row of that data that was received back from that snapshot//
 database.ref().on("child_added", function(childSnapshot) {
-	// console.log(childSnapshot.val().trainName);
-	// console.log(childSnapshot.val().destinationName);
-	// console.log(childSnapshot.val().firstTrainTime);
-	// console.log(childSnapshot.val().frequency);
+
 
 	$("tbody").append("<tr><td>" + childSnapshot.val().train + "</td><td>" + childSnapshot.val().destination + "</td><td>" + childSnapshot.val().frequency + "</td><td>" + childSnapshot.val().firsttrain + "</td><td>" + childSnapshot.val().howmanyminutes + "</td></tr>");
 
@@ -51,6 +55,7 @@ database.ref().on("child_added", function(childSnapshot) {
 
 });
 
+//The snapshots are ordered by date added//
 database.ref().orderByChild("dateAdded").limitToLast(1).on("child_added", function(snapshot){
 
 	$("#train-name-table").html(snapshot.val().train);
